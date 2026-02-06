@@ -6,5 +6,9 @@
         "outDir": "./dist",
         "strict": true
     },
-    "exclude": ["packages", "node_modules", "dist"]
+    "exclude": [
+        "packages",
+        "node_modules",
+        "dist"
+    ]
 }

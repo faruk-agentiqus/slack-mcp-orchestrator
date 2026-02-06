@@ -4,7 +4,9 @@ import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = path.resolve(__dirname, '../../data');
+// In production (Docker), use absolute path matching the volume mount.
+// In dev, resolve relative to source root.
+const DATA_DIR = process.env.DATA_DIR || path.resolve(__dirname, '../../data');
 const DB_PATH = path.join(DATA_DIR, 'mcp-orchestrator.db');
 
 let db: Database.Database;
