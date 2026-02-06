@@ -35,7 +35,7 @@ export const userGenerateConfigCallback = async ({
     const orgId = context.enterpriseId ?? context.teamId ?? 'unknown';
 
     const perms = getEffectivePermissions(userId, orgId);
-    const hasAny = Object.values(perms).some(f => f.read || f.write);
+    const hasAny = Object.values(perms).some((f) => f.read || f.write);
 
     if (!hasAny) {
       await client.views.open({
@@ -81,7 +81,7 @@ export const userGenerateConfigCallback = async ({
         },
       },
       null,
-      2
+      2,
     );
 
     await client.views.open({
@@ -90,28 +90,33 @@ export const userGenerateConfigCallback = async ({
         type: 'modal',
         callback_id: 'user_config_modal',
         title: { type: 'plain_text', text: 'MCP Configuration' },
-        close: { type: 'plain_text', text: 'Close' },
+        close: { type: 'plain_text', text: 'Done' },
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: ':warning: *Copy this config and keep it safe.* The token grants access to Slack on your behalf. It will not be shown again.',
+              text: ':warning: *Copy this config and keep it safe.* The token grants access to Slack on your behalf. Generating a new config will revoke the previous one.',
             },
           },
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: 'Paste this into your `.cursor/mcp.json` or Claude Desktop config:',
+              text: '*For Cursor:* paste into `~/.cursor/mcp.json`\n*For Claude Desktop:* paste into your Claude config file',
             },
           },
           {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: `\`\`\`${config}\`\`\``,
+            type: 'input',
+            block_id: 'config_block',
+            label: { type: 'plain_text', text: 'Your MCP Config (click, Cmd+A, Cmd+C to copy)' },
+            element: {
+              type: 'plain_text_input',
+              action_id: 'config_text',
+              multiline: true,
+              initial_value: config,
             },
+            optional: true,
           },
         ],
       },
