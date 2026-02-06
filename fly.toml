@@ -1,0 +1,20 @@
+app = 'slack-mcp-orchestrator'
+primary_region = 'ams'
+
+[build]
+
+[env]
+  NODE_ENV = 'production'
+  PORT = '3000'
+  MCP_API_PORT = '3001'
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 1
+
+[mounts]
+  source = 'data'
+  destination = '/app/data'
