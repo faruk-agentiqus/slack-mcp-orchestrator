@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y python3 make g++ curl && rm -rf /var/li
 COPY package.json package-lock.json ./
 RUN npm ci --production=false
 
+# Force-rebuild native addons for this platform (linux/amd64)
+RUN npm rebuild better-sqlite3
+
 # Copy source and build
 COPY . .
 RUN npm run build
@@ -19,8 +22,8 @@ RUN npm install && npx tsc
 
 WORKDIR /app
 
-# Prune dev dependencies
-RUN npm prune --production
+# Prune dev dependencies (keep native modules intact)
+RUN npm prune --omit=dev
 
 EXPOSE 3000
 

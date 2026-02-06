@@ -1,0 +1,10 @@
+node_modules
+dist
+data
+.env
+.env.*
+!.env.sample
+packages/slack-mcp-client/node_modules
+packages/slack-mcp-client/dist
+.git
+.slack
