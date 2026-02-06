@@ -1,4 +1,8 @@
-import type { AllMiddlewareArgs, BlockAction, SlackActionMiddlewareArgs } from '@slack/bolt';
+import type {
+  AllMiddlewareArgs,
+  BlockAction,
+  SlackActionMiddlewareArgs,
+} from '@slack/bolt';
 import { isAdmin } from '../../src/permissions/admin.js';
 
 /**
@@ -58,12 +62,24 @@ export const adminBlockChannelCallback = async ({
               type: 'checkboxes',
               action_id: 'restrictions_checkboxes',
               options: [
-                { text: { type: 'plain_text', text: 'Block reading messages' }, value: 'read' },
-                { text: { type: 'plain_text', text: 'Block writing messages' }, value: 'write' },
+                {
+                  text: { type: 'plain_text', text: 'Block reading messages' },
+                  value: 'read',
+                },
+                {
+                  text: { type: 'plain_text', text: 'Block writing messages' },
+                  value: 'write',
+                },
               ],
               initial_options: [
-                { text: { type: 'plain_text', text: 'Block reading messages' }, value: 'read' },
-                { text: { type: 'plain_text', text: 'Block writing messages' }, value: 'write' },
+                {
+                  text: { type: 'plain_text', text: 'Block reading messages' },
+                  value: 'read',
+                },
+                {
+                  text: { type: 'plain_text', text: 'Block writing messages' },
+                  value: 'write',
+                },
               ],
             },
           },

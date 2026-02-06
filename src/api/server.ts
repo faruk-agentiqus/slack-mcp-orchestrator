@@ -86,7 +86,10 @@ export function mountMcpApi(expressApp: Application): void {
 
     // Check channel-level blocklist for tools that target a specific channel
     const channelArg = (toolArgs?.channel as string) ?? null;
-    if (channelArg && tool.permissionKey === 'channels' || channelArg && tool.permissionKey === 'chat') {
+    if (
+      (channelArg && tool.permissionKey === 'channels') ||
+      (channelArg && tool.permissionKey === 'chat')
+    ) {
       if (!isChannelAllowed(channelArg, orgId, tool.operation)) {
         res.status(403).json({
           error: `Channel ${channelArg} is blocked by your organization admin for ${tool.operation} access`,

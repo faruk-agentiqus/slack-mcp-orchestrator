@@ -16,7 +16,7 @@ const appHomeOpenedCallback = async ({
   try {
     const orgId = resolveOrgId(
       event as unknown as { team?: string },
-      context.enterpriseId ?? undefined,
+      context.enterpriseId ?? undefined
     );
     await publishHomeView(client, event.user, orgId);
   } catch (error) {

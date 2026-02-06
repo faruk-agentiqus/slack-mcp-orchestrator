@@ -1,4 +1,8 @@
-import type { AllMiddlewareArgs, BlockAction, SlackActionMiddlewareArgs } from '@slack/bolt';
+import type {
+  AllMiddlewareArgs,
+  BlockAction,
+  SlackActionMiddlewareArgs,
+} from '@slack/bolt';
 import { unblockChannel } from '../../src/permissions/channels.js';
 import { isAdmin } from '../../src/permissions/admin.js';
 import { publishHomeView } from '../../src/views/home-builder.js';

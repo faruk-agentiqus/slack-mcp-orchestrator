@@ -90,7 +90,8 @@ export const userGenerateConfigCallback = async ({
         type: 'modal',
         callback_id: 'user_config_modal',
         title: { type: 'plain_text', text: 'MCP Configuration' },
-        close: { type: 'plain_text', text: 'Done' },
+        submit: { type: 'plain_text', text: 'Done' },
+        close: { type: 'plain_text', text: 'Cancel' },
         blocks: [
           {
             type: 'section',

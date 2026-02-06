@@ -78,7 +78,11 @@ function buildAdminSection(orgId: string): KnownBlock[] {
     { type: 'divider' },
     {
       type: 'header',
-      text: { type: 'plain_text', text: 'Admin: Channel Restrictions', emoji: true },
+      text: {
+        type: 'plain_text',
+        text: 'Admin: Channel Restrictions',
+        emoji: true,
+      },
     },
     {
       type: 'section',
@@ -103,8 +107,12 @@ function buildAdminSection(orgId: string): KnownBlock[] {
   } else {
     for (const ch of blocked) {
       const name = ch.channelName ? `#${ch.channelName}` : ch.channelId;
-      const readStatus = ch.blockRead ? ':no_entry: Read blocked' : ':white_check_mark: Read allowed';
-      const writeStatus = ch.blockWrite ? ':no_entry: Write blocked' : ':white_check_mark: Write allowed';
+      const readStatus = ch.blockRead
+        ? ':no_entry: Read blocked'
+        : ':white_check_mark: Read allowed';
+      const writeStatus = ch.blockWrite
+        ? ':no_entry: Write blocked'
+        : ':white_check_mark: Write allowed';
 
       blocks.push({
         type: 'section',
@@ -132,7 +140,7 @@ function buildAdminSection(orgId: string): KnownBlock[] {
 export async function buildFullHomeView(
   client: WebClient,
   userId: string,
-  orgId: string,
+  orgId: string
 ): Promise<KnownBlock[]> {
   const blocks = buildUserSection(userId, orgId);
 
@@ -150,7 +158,7 @@ export async function buildFullHomeView(
 export async function publishHomeView(
   client: WebClient,
   userId: string,
-  orgId: string,
+  orgId: string
 ): Promise<void> {
   const blocks = await buildFullHomeView(client, userId, orgId);
   await client.views.publish({
