@@ -2,8 +2,8 @@ FROM node:22-slim
 
 WORKDIR /app
 
-# Install build tools for better-sqlite3 native addon
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+# Install build tools for better-sqlite3 native addon + curl for healthcheck
+RUN apt-get update && apt-get install -y python3 make g++ curl && rm -rf /var/lib/apt/lists/*
 
 # Copy package files and install
 COPY package.json package-lock.json ./
@@ -23,5 +23,8 @@ WORKDIR /app
 RUN npm prune --production
 
 EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
+  CMD curl -f http://localhost:3000/api/mcp/health || exit 1
 
 CMD ["node", "dist/app.js"]

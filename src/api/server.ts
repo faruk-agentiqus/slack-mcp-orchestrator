@@ -1,10 +1,24 @@
 import express from 'express';
-import type { Application } from 'express';
+import type { Application, Request, Response, NextFunction } from 'express';
+import rateLimit from 'express-rate-limit';
 import { WebClient } from '@slack/web-api';
 import { authMiddleware, type AuthenticatedRequest } from './middleware.js';
 import { isAllowed } from '../permissions/engine.js';
 import { getToolByName, toolsToMcpFormat, type ToolContext } from './tools.js';
 import { getInstallationByOrgId } from '../db/installation-store.js';
+
+/** Per-user rate limiter: 60 requests per minute keyed by JWT identity. */
+const mcpRateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => {
+    const auth = (req as AuthenticatedRequest).tokenPayload;
+    return auth ? `${auth.sub}:${auth.org}` : req.ip ?? 'unknown';
+  },
+  message: { error: 'Too many requests. Try again shortly.' },
+});
 
 /**
  * Mount the MCP proxy API routes on the given Express app.
@@ -14,13 +28,14 @@ import { getInstallationByOrgId } from '../db/installation-store.js';
 export function mountMcpApi(expressApp: Application): void {
   expressApp.use(express.json());
 
-  // Health check (no auth)
+  // Health check (no auth, no rate limit)
   expressApp.get('/api/mcp/health', (_req, res) => {
-    res.json({ ok: true });
+    res.json({ ok: true, timestamp: new Date().toISOString() });
   });
 
-  // All MCP routes require JWT auth
+  // All MCP routes require JWT auth, then rate limiting
   expressApp.use('/api/mcp', authMiddleware);
+  expressApp.use('/api/mcp', mcpRateLimiter);
 
   // -----------------------------------------------------------------------
   // POST /api/mcp/tools/list
@@ -86,6 +101,17 @@ export function mountMcpApi(expressApp: Application): void {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Tool execution failed';
       res.status(500).json({ error: message, isRetryable: false });
+    }
+  });
+
+  // -----------------------------------------------------------------------
+  // Centralized error handler — never leak internals in production
+  // -----------------------------------------------------------------------
+  expressApp.use('/api/mcp', (err: Error, _req: Request, res: Response, _next: NextFunction) => {
+    if (process.env.NODE_ENV === 'production') {
+      res.status(500).json({ error: 'Internal server error' });
+    } else {
+      res.status(500).json({ error: err.message, stack: err.stack });
     }
   });
 }

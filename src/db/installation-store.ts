@@ -34,7 +34,7 @@ function queryId(query: InstallationQuery<boolean>): string {
  * Each workspace/org install gets a row with its bot token and full data blob.
  */
 export const sqliteInstallationStore: InstallationStore = {
-  storeInstallation: async (installation) => {
+  storeInstallation: async installation => {
     const db = getDatabase();
     const id = installationId(installation);
 
@@ -46,7 +46,7 @@ export const sqliteInstallationStore: InstallationStore = {
          bot_id = excluded.bot_id,
          bot_user_id = excluded.bot_user_id,
          data = excluded.data,
-         updated_at = excluded.updated_at`,
+         updated_at = excluded.updated_at`
     ).run(
       id,
       installation.team?.id ?? null,
@@ -55,11 +55,11 @@ export const sqliteInstallationStore: InstallationStore = {
       installation.bot?.id ?? null,
       installation.bot?.userId ?? null,
       installation.isEnterpriseInstall ? 1 : 0,
-      JSON.stringify(installation),
+      JSON.stringify(installation)
     );
   },
 
-  fetchInstallation: async (query) => {
+  fetchInstallation: async query => {
     const db = getDatabase();
     const id = queryId(query);
     const row = db
@@ -72,7 +72,7 @@ export const sqliteInstallationStore: InstallationStore = {
     return JSON.parse(row.data) as Installation;
   },
 
-  deleteInstallation: async (query) => {
+  deleteInstallation: async query => {
     const db = getDatabase();
     const id = queryId(query);
     db.prepare('DELETE FROM installations WHERE id = ?').run(id);
@@ -98,13 +98,23 @@ export function getInstallationByOrgId(orgId: string): InstallationInfo | null {
 
   // Try enterprise-level first
   let row = db
-    .prepare('SELECT bot_token, team_id, enterprise_id FROM installations WHERE enterprise_id = ?')
-    .get(orgId) as { bot_token: string; team_id: string | null; enterprise_id: string | null } | undefined;
+    .prepare(
+      'SELECT bot_token, team_id, enterprise_id FROM installations WHERE enterprise_id = ?'
+    )
+    .get(orgId) as
+    | {
+        bot_token: string;
+        team_id: string | null;
+        enterprise_id: string | null;
+      }
+    | undefined;
 
   // Fall back to team-level
   if (!row) {
     row = db
-      .prepare('SELECT bot_token, team_id, enterprise_id FROM installations WHERE team_id = ?')
+      .prepare(
+        'SELECT bot_token, team_id, enterprise_id FROM installations WHERE team_id = ?'
+      )
       .get(orgId) as typeof row;
   }
 

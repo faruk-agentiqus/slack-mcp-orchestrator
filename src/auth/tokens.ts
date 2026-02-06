@@ -83,6 +83,17 @@ export function revokeToken(jti: string): void {
 export function revokeAllForUser(userId: string, orgId: string): void {
   const db = getDatabase();
   db.prepare(
-    'UPDATE tokens SET is_revoked = 1 WHERE user_id = ? AND org_id = ? AND is_revoked = 0'
+    'UPDATE tokens SET is_revoked = 1 WHERE user_id = ? AND org_id = ? AND is_revoked = 0',
   ).run(userId, orgId);
+}
+
+/** Delete expired and revoked tokens from the database. */
+export function cleanupExpiredTokens(): void {
+  const db = getDatabase();
+  const result = db
+    .prepare("DELETE FROM tokens WHERE expires_at < datetime('now') OR is_revoked = 1")
+    .run();
+  if (result.changes > 0) {
+    console.log(`Token cleanup: removed ${result.changes} expired/revoked tokens`);
+  }
 }

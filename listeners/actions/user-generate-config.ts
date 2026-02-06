@@ -35,7 +35,7 @@ export const userGenerateConfigCallback = async ({
     const orgId = context.enterpriseId ?? context.teamId ?? 'unknown';
 
     const perms = getEffectivePermissions(userId, orgId);
-    const hasAny = Object.values(perms).some((f) => f.read || f.write);
+    const hasAny = Object.values(perms).some(f => f.read || f.write);
 
     if (!hasAny) {
       await client.views.open({
@@ -81,7 +81,7 @@ export const userGenerateConfigCallback = async ({
         },
       },
       null,
-      2,
+      2
     );
 
     await client.views.open({
