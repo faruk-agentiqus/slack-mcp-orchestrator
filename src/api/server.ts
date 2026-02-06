@@ -6,6 +6,7 @@ import { authMiddleware, type AuthenticatedRequest } from './middleware.js';
 import { isAllowed } from '../permissions/engine.js';
 import { getToolByName, toolsToMcpFormat, type ToolContext } from './tools.js';
 import { getInstallationByOrgId } from '../db/installation-store.js';
+import { isChannelAllowed } from '../permissions/channels.js';
 
 /** Per-user rate limiter: 60 requests per minute keyed by JWT identity. */
 const mcpRateLimiter = rateLimit({
@@ -81,6 +82,17 @@ export function mountMcpApi(expressApp: Application): void {
         error: `Permission denied: ${tool.permissionKey}:${tool.operation}`,
       });
       return;
+    }
+
+    // Check channel-level blocklist for tools that target a specific channel
+    const channelArg = (toolArgs?.channel as string) ?? null;
+    if (channelArg && tool.permissionKey === 'channels' || channelArg && tool.permissionKey === 'chat') {
+      if (!isChannelAllowed(channelArg, orgId, tool.operation)) {
+        res.status(403).json({
+          error: `Channel ${channelArg} is blocked by your organization admin for ${tool.operation} access`,
+        });
+        return;
+      }
     }
 
     // Resolve bot token for this org from installation store

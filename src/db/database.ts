@@ -60,6 +60,18 @@ export function initDatabase(): Database.Database {
     );
     CREATE INDEX IF NOT EXISTS idx_installations_team ON installations(team_id);
     CREATE INDEX IF NOT EXISTS idx_installations_enterprise ON installations(enterprise_id);
+
+    CREATE TABLE IF NOT EXISTS channel_blocklist (
+      channel_id   TEXT NOT NULL,
+      org_id       TEXT NOT NULL,
+      channel_name TEXT,
+      block_read   INTEGER DEFAULT 1,
+      block_write  INTEGER DEFAULT 1,
+      blocked_by   TEXT NOT NULL,
+      created_at   TEXT DEFAULT (datetime('now')),
+      PRIMARY KEY (channel_id, org_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_channel_blocklist_org ON channel_blocklist(org_id);
   `);
 
   return db;
