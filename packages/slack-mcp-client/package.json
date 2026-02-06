@@ -1,0 +1,25 @@
+{
+  "name": "@agentiqus/slack-mcp-client",
+  "version": "0.1.0",
+  "description": "Thin stdio MCP server that proxies Slack operations through the MCP Orchestrator API",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "slack-mcp-client": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
