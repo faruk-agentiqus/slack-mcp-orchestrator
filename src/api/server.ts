@@ -41,10 +41,11 @@ export function mountMcpApi(expressApp: Application): void {
   // POST /api/mcp/tools/list
   // -----------------------------------------------------------------------
   expressApp.post('/api/mcp/tools/list', (req, res) => {
-    const { sub: userId, org: orgId } = (req as AuthenticatedRequest).tokenPayload;
+    const { sub: userId, org: orgId } = (req as AuthenticatedRequest)
+      .tokenPayload;
 
     const allTools = toolsToMcpFormat();
-    const allowed = allTools.filter((t) => {
+    const allowed = allTools.filter(t => {
       const def = getToolByName(t.name);
       if (!def) return false;
       return isAllowed(userId, orgId, def.permissionKey, def.operation);
@@ -57,7 +58,8 @@ export function mountMcpApi(expressApp: Application): void {
   // POST /api/mcp/tools/call
   // -----------------------------------------------------------------------
   expressApp.post('/api/mcp/tools/call', async (req, res) => {
-    const { sub: userId, org: orgId } = (req as AuthenticatedRequest).tokenPayload;
+    const { sub: userId, org: orgId } = (req as AuthenticatedRequest)
+      .tokenPayload;
     const { name, arguments: toolArgs } = req.body as {
       name: string;
       arguments?: Record<string, unknown>;
@@ -85,7 +87,8 @@ export function mountMcpApi(expressApp: Application): void {
     const installation = getInstallationByOrgId(orgId);
     if (!installation) {
       res.status(404).json({
-        error: 'No Slack installation found for this organization. Has the app been installed?',
+        error:
+          'No Slack installation found for this organization. Has the app been installed?',
       });
       return;
     }
@@ -99,7 +102,8 @@ export function mountMcpApi(expressApp: Application): void {
       const result = await tool.execute(ctx, toolArgs ?? {});
       res.json({ content: [{ type: 'text', text: JSON.stringify(result) }] });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Tool execution failed';
+      const message =
+        err instanceof Error ? err.message : 'Tool execution failed';
       res.status(500).json({ error: message, isRetryable: false });
     }
   });
@@ -107,11 +111,14 @@ export function mountMcpApi(expressApp: Application): void {
   // -----------------------------------------------------------------------
   // Centralized error handler — never leak internals in production
   // -----------------------------------------------------------------------
-  expressApp.use('/api/mcp', (err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    if (process.env.NODE_ENV === 'production') {
-      res.status(500).json({ error: 'Internal server error' });
-    } else {
-      res.status(500).json({ error: err.message, stack: err.stack });
+  expressApp.use(
+    '/api/mcp',
+    (err: Error, _req: Request, res: Response, _next: NextFunction) => {
+      if (process.env.NODE_ENV === 'production') {
+        res.status(500).json({ error: 'Internal server error' });
+      } else {
+        res.status(500).json({ error: err.message, stack: err.stack });
+      }
     }
-  });
+  );
 }

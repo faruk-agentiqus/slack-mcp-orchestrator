@@ -35,10 +35,10 @@ Paste into your Claude Desktop config file.
 
 ## Environment Variables
 
-| Variable | Description |
-|---|---|
-| `MCP_TOKEN` | Per-user JWT issued by the MCP Orchestrator Slack app |
-| `MCP_API_URL` | Base URL of the MCP Orchestrator API |
+| Variable      | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| `MCP_TOKEN`   | Per-user JWT issued by the MCP Orchestrator Slack app |
+| `MCP_API_URL` | Base URL of the MCP Orchestrator API                  |
 
 ## How It Works
 

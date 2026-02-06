@@ -37,17 +37,14 @@
   "settings": {
     "event_subscriptions": {
       "request_url": "https://slack-mcp-orchestrator.fly.dev/slack/events",
-      "bot_events": [
-        "app_home_opened",
-        "app_uninstalled"
-      ]
+      "bot_events": ["app_home_opened", "app_uninstalled"]
     },
     "interactivity": {
       "is_enabled": true,
       "request_url": "https://slack-mcp-orchestrator.fly.dev/slack/events"
     },
     "org_deploy_enabled": true,
-    "socket_mode_enabled": false,
+    "socket_mode_enabled": true,
     "token_rotation_enabled": true
   }
 }

@@ -22,10 +22,14 @@ const appUninstalledCallback = async ({
     const db = getDatabase();
 
     // Delete installation records
-    db.prepare('DELETE FROM installations WHERE enterprise_id = ? OR team_id = ?').run(orgId, orgId);
+    db.prepare(
+      'DELETE FROM installations WHERE enterprise_id = ? OR team_id = ?'
+    ).run(orgId, orgId);
 
     // Revoke all tokens for this org
-    db.prepare('UPDATE tokens SET is_revoked = 1 WHERE org_id = ? AND is_revoked = 0').run(orgId);
+    db.prepare(
+      'UPDATE tokens SET is_revoked = 1 WHERE org_id = ? AND is_revoked = 0'
+    ).run(orgId);
 
     // Delete all user permissions for this org
     db.prepare('DELETE FROM user_permissions WHERE org_id = ?').run(orgId);
