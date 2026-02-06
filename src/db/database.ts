@@ -43,6 +43,21 @@ export function initDatabase(): Database.Database {
       created_at TEXT DEFAULT (datetime('now')),
       expires_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS installations (
+      id          TEXT PRIMARY KEY,
+      team_id     TEXT,
+      enterprise_id TEXT,
+      bot_token   TEXT NOT NULL,
+      bot_id      TEXT,
+      bot_user_id TEXT,
+      is_enterprise INTEGER DEFAULT 0,
+      data        TEXT NOT NULL,
+      installed_at TEXT DEFAULT (datetime('now')),
+      updated_at   TEXT DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_installations_team ON installations(team_id);
+    CREATE INDEX IF NOT EXISTS idx_installations_enterprise ON installations(enterprise_id);
   `);
 
   return db;

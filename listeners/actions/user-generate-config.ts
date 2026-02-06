@@ -4,10 +4,18 @@ import type {
   SlackActionMiddlewareArgs,
 } from '@slack/bolt';
 import { signToken } from '../../src/auth/tokens.js';
-import {
-  getEffectivePermissions,
-  emptyPermissions,
-} from '../../src/permissions/engine.js';
+import { getEffectivePermissions } from '../../src/permissions/engine.js';
+
+/**
+ * Resolve the public MCP API URL.
+ * In production this comes from the MCP_API_URL env var (set once at deploy).
+ * Falls back to localhost for development.
+ */
+function getMcpApiUrl(): string {
+  if (process.env.MCP_API_URL) return process.env.MCP_API_URL;
+  const port = process.env.PORT || '3000';
+  return `http://localhost:${port}/api/mcp`;
+}
 
 /**
  * Generate a per-user MCP config JSON containing a fresh JWT.
@@ -26,9 +34,8 @@ export const userGenerateConfigCallback = async ({
     const userId = (body as { user: { id: string } }).user.id;
     const orgId = context.enterpriseId ?? context.teamId ?? 'unknown';
 
-    // Check the user has at least some permissions
     const perms = getEffectivePermissions(userId, orgId);
-    const hasAny = Object.values(perms).some(f => f.read || f.write);
+    const hasAny = Object.values(perms).some((f) => f.read || f.write);
 
     if (!hasAny) {
       await client.views.open({
@@ -42,7 +49,7 @@ export const userGenerateConfigCallback = async ({
               type: 'section',
               text: {
                 type: 'mrkdwn',
-                text: 'You do not have any MCP permissions configured. Contact your workspace admin to get access.',
+                text: 'You have no permissions enabled. Click *Edit Permissions* first to select what AI tools can access.',
               },
             },
           ],
@@ -53,14 +60,10 @@ export const userGenerateConfigCallback = async ({
 
     // Generate a new token (revokes any previous one)
     const token = signToken(userId, orgId);
+    const apiUrl = getMcpApiUrl();
 
-    const apiUrl =
-      process.env.MCP_API_URL ||
-      `http://localhost:${process.env.MCP_API_PORT || 3001}/api/mcp`;
-
-    // Use MCP_CLIENT_PATH env var for local dev, fall back to npx for published package
+    // Use MCP_CLIENT_PATH for local dev, npx for published package
     const clientPath = process.env.MCP_CLIENT_PATH;
-
     const serverConfig = clientPath
       ? { command: 'node', args: [clientPath] }
       : { command: 'npx', args: ['-y', '@agentiqus/slack-mcp-client'] };
@@ -78,7 +81,7 @@ export const userGenerateConfigCallback = async ({
         },
       },
       null,
-      2
+      2,
     );
 
     await client.views.open({

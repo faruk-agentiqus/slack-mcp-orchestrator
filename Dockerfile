@@ -13,7 +13,7 @@ RUN npm ci --production=false
 COPY . .
 RUN npm run build
 
-# Build the MCP client package too
+# Build the MCP client package
 WORKDIR /app/packages/slack-mcp-client
 RUN npm install && npx tsc
 
@@ -22,6 +22,6 @@ WORKDIR /app
 # Prune dev dependencies
 RUN npm prune --production
 
-EXPOSE 3000 3001
+EXPOSE 3000
 
 CMD ["node", "dist/app.js"]
